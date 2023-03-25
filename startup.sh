@@ -7,4 +7,4 @@ num_cpus=$(nproc)
 num_workers=$((2 * $num_cpus))
 
 # Start the FastAPI app with the specified number of workers
-uvicorn myapp:app --workers $num_workers
+uvicorn main:app --workers $num_workers
