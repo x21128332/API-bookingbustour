@@ -21,8 +21,10 @@ def view_timetables():
     cursor = conn.cursor()
     cursor.execute("EXEC dbo.timetable_procedure;")    
     rows = cursor.fetchall()
+    timetables = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
+
     conn.close() 
-    return {"rows": rows}
+    return {"timetables": timetables}
 
 
 # @app.post("/bookings")
