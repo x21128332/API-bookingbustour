@@ -22,7 +22,7 @@ def view_timetables():
     cursor.execute("EXEC dbo.timetable_procedure;")    
     rows = cursor.fetchall()
     conn.close() 
-    return {"timetables": "timetables"}
+    return {"rows": rows}
 
 
 # @app.post("/bookings")
