@@ -26,11 +26,13 @@ def view_timetables():
     conn.close() 
     return {"timetables": timetables}
 
+@app.get("/bookings")
+def view_bookings():
+    conn = get_db_connection()  
+    cursor = conn.cursor()
+    cursor.execute("EXEC dbo.get_booking_procedure;")    
+    rows = cursor.fetchall()
+    bookings = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
 
-# @app.post("/bookings")
-# async def create_booking(booking: BookingSchema, db: pyodbc.Connection = Depends(get_db)):
-#     cursor = db.cursor()
-#     insert_query = f"INSERT INTO bookings (tour_id, passenger_name, email, phone_number, number_of_passengers, pickup_address, pickup_date, pickup_time) VALUES ('{booking.tour_id}', '{booking.passenger_name}', '{booking.email}', '{booking.phone_number}', {booking.number_of_passengers}, '{booking.pickup_address}', '{booking.pickup_date}', '{booking.pickup_time}')"
-#     cursor.execute(insert_query)
-#     db.commit()
-#     return {"message": "Booking created"}
+    conn.close() 
+    return {"bookings": bookings}
