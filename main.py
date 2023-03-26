@@ -1,10 +1,7 @@
 import pyodbc
 from fastapi import FastAPI
-from opencensus.ext.fastapi.middleware import OpenCensusMiddleware
 
 app = FastAPI()
-
-app.add_middleware(OpenCensusMiddleware)
 
 def get_db_connection():
     server = 'sqlaislingsbustour.database.windows.net'
@@ -12,7 +9,6 @@ def get_db_connection():
     #using managed identity so no need for user + pass
     connection_string = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:sqlaislingsbustour.database.windows.net,1433;Database=sqlaislingsbustour;Authentication=ActiveDirectoryMsi; Encrypt=yes'
     return pyodbc.connect(connection_string)
-
 
 @app.get("/")
 def read_root():
