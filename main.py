@@ -2,7 +2,7 @@ import pyodbc
 from fastapi import FastAPI, APIRouter, HTTPException
 
 router = APIRouter()
-app = FastAPI()
+app = FastAPI(title="Sample FastAPI Application")
 
 def get_db_connection():
     server = 'sqlaislingsbustour.database.windows.net'
@@ -22,7 +22,6 @@ def view_timetables():
     cursor.execute("EXEC dbo.timetable_procedure;")    
     rows = cursor.fetchall()
     timetables = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
-
     conn.close() 
     return {"timetables": timetables}
 
@@ -36,22 +35,16 @@ def view_bookings():
     book_conn.close() 
     return {"bookings": bookings}
 
-def test_view_bookings():
-    book_conn = get_db_connection()  
-    book_cursor = book_conn.cursor()
-    book_cursor.execute("EXEC dbo.get_booking_procedure;")    
-    book_rows = book_cursor.fetchall()
-    bookings = [dict(zip([column[0] for column in book_cursor.description], row)) for row in book_rows]
-    book_conn.close() 
-    return {"bookings": bookings}
+@app.get('/bookings/{booking_id}')
+def get_booking(booking_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
+    cursor.execute("EXEC dbo.get_booking_procedure @booking_id=?", booking_id)
+    booking = cursor.fetchone()
+    cursor.close()
 
-@router.get("/{booking_id}")
-async def get_booking(booking_id: str = None):
-    if booking_id is None:
-        raise HTTPException(status_code=400, detail="booking_id parameter is required")
-    # Lookup booking by booking_id in database
-    booking = test_view_bookings(booking_id)
-    if booking is None:
-        raise HTTPException(status_code=404, detail="Booking not found")
-    return booking
-
+    if not booking:
+        return {'error': 'Booking not found'}
+    
+    return {'booking_id': booking[0], 'booking_id': booking[1], 'booking_date': booking[2], 'first_name': booking[3], 'last_name': booking[4], 'seat_number': booking[5], 'origin': booking[6], 'destination': booking[7]}
