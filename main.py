@@ -29,7 +29,8 @@ def view_timetables():
 def view_bookings():
     book_conn = get_db_connection()  
     book_cursor = book_conn.cursor()
-    book_cursor.execute("EXEC dbo.get_booking_procedure;")    
+    #book_cursor.execute("EXEC dbo.get_booking_procedure;")
+    book_cursor.execute("EXEC dbo.timetable_procedure;")        
     book_rows = book_cursor.fetchall()
     bookings = [dict(zip([column[0] for column in book_cursor.description], row)) for row in book_rows]
 
