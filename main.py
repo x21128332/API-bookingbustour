@@ -22,17 +22,19 @@ def view_timetables():
     cursor.execute("EXEC dbo.timetable_procedure;")    
     rows = cursor.fetchall()
     timetables = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
-    conn.close() 
+    cursor.close()
+    conn.close()
     return {"timetables": timetables}
 
 @app.get("/bookings")
 def view_bookings():
-    book_conn = get_db_connection()  
-    book_cursor = book_conn.cursor()
-    book_cursor.execute("EXEC dbo.get_booking_procedure;")    
-    book_rows = book_cursor.fetchall()
-    bookings = [dict(zip([column[0] for column in book_cursor.description], row)) for row in book_rows]
-    book_conn.close() 
+    conn = get_db_connection()  
+    cursor = conn.cursor()
+    cursor.execute("EXEC dbo.get_booking_procedure;")    
+    book_rows = cursor.fetchall()
+    bookings = [dict(zip([column[0] for column in cursor.description], row)) for row in book_rows]
+    cursor.close()
+    conn.close() 
     return {"bookings": bookings}
 
 @app.get('/bookings/{booking_id}')
@@ -49,7 +51,10 @@ def get_booking(booking_id: int):
         if not booking:
             return {'error': 'Booking not found'}
         
-        return {'booking_id': booking.booking_id, 'booking_date': booking.booking_date, 'first_name': booking.first_name}
+        columns = [column[0] for column in cursor.description]
+        booking_dict = dict(zip(columns, booking))
+        return booking_dict
+        #    return {'booking_id': booking.booking_id, 'booking_date': booking.booking_date, 'first_name': booking.first_name}
 
     except Exception as e:
         print("Error: %s" % e)
