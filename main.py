@@ -40,30 +40,33 @@ def get_booking(booking_id: int):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        # adding the sql stored procedure script and parameter values
-        stored_proc = "[dbo].[search_booking_procedure] @booking_id = ?"
-        params = (booking_id)
-        # Execute stored procedur with the params
-        cursor.execute(stored_proc, params)
-    
-        # Iterate the cursor
-        row = cursor.fetchone()
-        while row:
-            print(str(row[0]) + " : " + str(row[1] or 'hi') )
-            row = cursor.fetchone()
+        #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
+        cursor.execute("EXEC [dbo].[search_booking_procedure] @booking_id = ?", booking_id)
+        booking = cursor.fetchone()
         cursor.close()
-        del cursor
         conn.close()
+
+        if not booking:
+            return {'error': 'Booking not found'}
+        
+        return {'booking_id': booking.booking_id, 'booking_date': booking.booking_date, 'first_name': booking.first_name}
 
     except Exception as e:
         print("Error: %s" % e)
 
-    # #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
-    # cursor.execute("EXEC [dbo].[search_booking_procedure] @booking_id = ?", booking_id)
-    # booking = cursor.fetchone()
-    # cursor.close()
-
-    # if not booking:
-    #     return {'error': 'Booking not found'}
     
-    # return {'booking_id': booking.booking_id}
+
+#  # adding the sql stored procedure script and parameter values
+#         stored_proc = "[dbo].[search_booking_procedure] @booking_id = ?"
+#         params = (booking_id)
+#         # Execute stored procedur with the params
+#         cursor.execute(stored_proc, params)
+    
+#         # Iterate the cursor
+#         row = cursor.fetchone()
+#         while row:
+#             print(str(row[0]) + " : " + str(row[1] or 'hi') )
+#             row = cursor.fetchone()
+#         cursor.close()
+#         del cursor
+#         conn.close()
