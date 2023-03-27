@@ -49,7 +49,7 @@ def get_booking(booking_id: int):
         # Iterate the cursor
         row = cursor.fetchone()
         while row:
-            print(str(row[0]) + " : " + str(row[1] or '') )
+            print(str(row[0]) + " : " + str(row[1] or 'hi') )
             row = cursor.fetchone()
         cursor.close()
         del cursor
