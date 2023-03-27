@@ -44,7 +44,7 @@ def get_booking(booking_id: int):
     booking = cursor.fetchone()
     cursor.close()
 
-    if not booking_id:
+    if not booking:
         return {'error': 'Booking not found'}
     
-    return {'booking_id': booking[0], 'booking_id': booking[1], 'booking_date': booking[2], 'first_name': booking[3], 'last_name': booking[4], 'seat_number': booking[5], 'origin': booking[6], 'destination': booking[7]}
+    return {'booking_id': booking.booking_id}
