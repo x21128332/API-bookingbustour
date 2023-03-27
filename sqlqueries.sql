@@ -31,3 +31,15 @@ FROM [dbo].[bookings]
 JOIN [dbo].[passengers] ON [dbo].[bookings].passenger_id=[dbo].[passengers].passenger_id
 JOIN [dbo].[tours] ON [dbo].[bookings].tour_id=[dbo].[tours].tour_id;
 GO;
+
+CREATE PROCEDURE search_booking_procedure
+    @booking_id INT
+AS
+BEGIN
+    SELECT [dbo].[bookings].booking_id, [dbo].[bookings].booking_date, [dbo].[passengers].first_name, [dbo].[passengers].last_name, [dbo].[bookings].seat_number, [dbo].[tours].origin, [dbo].[tours].destination
+		FROM [dbo].[bookings]
+		JOIN [dbo].[passengers] ON [dbo].[bookings].passenger_id=[dbo].[passengers].passenger_id
+		JOIN [dbo].[tours] ON [dbo].[bookings].tour_id=[dbo].[tours].tour_id
+  	WHERE [dbo].[bookings].booking_id = @booking_id;
+END;
+GO

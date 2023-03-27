@@ -40,7 +40,7 @@ def get_booking(booking_id: int):
     conn = get_db_connection()
     cursor = conn.cursor()
     #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
-    cursor.execute("EXEC dbo.get_booking_procedure @booking_id=?", booking_id)
+    cursor.execute("EXEC [dbo].[search_booking_procedure] @booking_id = ?", booking_id)
     booking = cursor.fetchone()
     cursor.close()
 
