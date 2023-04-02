@@ -2,7 +2,7 @@ import pyodbc
 from fastapi import FastAPI, APIRouter, HTTPException
 
 router = APIRouter()
-app = FastAPI(title="Sample FastAPI Application")
+app = FastAPI(title="Aisling Bus Tours API")
 
 def get_db_connection():
     server = 'sqlaislingsbustour.database.windows.net'
@@ -44,6 +44,7 @@ def get_booking(booking_id: int):
         cursor = conn.cursor()
         #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
         cursor.execute("EXEC [dbo].[search_booking_procedure] @booking_id = ?", booking_id)
+        columns = [column[0] for column in cursor.description]
         booking = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -51,7 +52,6 @@ def get_booking(booking_id: int):
         if not booking:
             return {'error': 'Booking not found'}
         
-        columns = [column[0] for column in cursor.description]
         booking_dict = dict(zip(columns, booking))
         return booking_dict
         #    return {'booking_id': booking.booking_id, 'booking_date': booking.booking_date, 'first_name': booking.first_name}
