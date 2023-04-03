@@ -1,5 +1,6 @@
 import pyodbc
 from fastapi import FastAPI, APIRouter, HTTPException
+from pydantic import BaseModel
 
 router = APIRouter()
 app = FastAPI(title="Aisling Bus Tours API")
@@ -10,6 +11,10 @@ def get_db_connection():
     #using managed identity so no need for user + pass
     connection_string = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:sqlaislingsbustour.database.windows.net,1433;Database=sqlaislingsbustour;Authentication=ActiveDirectoryMsi; Encrypt=yes'
     return pyodbc.connect(connection_string)
+
+class Booking(BaseModel):
+    passenger_id: int
+    tour_id: int
 
 @app.get("/")
 def read_root():
@@ -59,6 +64,20 @@ def get_booking(booking_id: int):
     except Exception as e:
         print("Error: %s" % e)
 
+@app.post('/create_booking}')
+async def create_booking(booking: Booking):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
+        cursor.execute("EXEC [dbo].[create_booking] @passenger_id = ? ",booking.passenger_id,", @tour_id = ?", booking.tour_id)
+        cursor.close()
+        conn.close()
+        
+        return("Booking created")
+       
+    except Exception as e:
+        print("Error: %s" % e)
     
 
 #  # adding the sql stored procedure script and parameter values
