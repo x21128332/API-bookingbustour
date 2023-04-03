@@ -64,13 +64,12 @@ def get_booking(booking_id: int):
     except Exception as e:
         print("Error: %s" % e)
 
-@app.post('/create_booking}')
+@app.post('/create_booking')
 async def create_booking(booking: Booking):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
-        cursor.execute("EXEC [dbo].[create_booking] @passenger_id = ? ",booking.passenger_id,", @tour_id = ?", booking.tour_id)
+        cursor.execute("EXEC [dbo].[create_booking] @email_address = ? ",booking.email_address,", @tour_id = ?", booking.tour_id)
         cursor.close()
         conn.close()
         
