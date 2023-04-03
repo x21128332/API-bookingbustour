@@ -28,7 +28,7 @@ CREATE PROCEDURE get_booking_procedure
 AS
 SELECT [dbo].[bookings].booking_date, [dbo].[passengers].first_name, [dbo].[passengers].last_name, [dbo].[bookings].seat_number, [dbo].[tours].origin, [dbo].[tours].destination
 FROM [dbo].[bookings]
-JOIN [dbo].[passengers] ON [dbo].[bookings].passenger_id=[dbo].[passengers].passenger_id
+JOIN [dbo].[passengers] ON [dbo].[bookings].email_address=[dbo].[passengers].email_address
 JOIN [dbo].[tours] ON [dbo].[bookings].tour_id=[dbo].[tours].tour_id;
 GO;
 
