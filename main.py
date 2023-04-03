@@ -13,7 +13,7 @@ def get_db_connection():
     return pyodbc.connect(connection_string)
 
 class Booking(BaseModel):
-    passenger_id: int
+    email_address: str
     tour_id: int
 
 @app.get("/")
