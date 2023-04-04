@@ -106,10 +106,19 @@ async def delete_booking(booking_id: int):
         cursor.close()
         conn.close()
 
-        if cursor.rowcount > 0:
+        cursor.execute("SELECT COUNT(*) FROM bookings WHERE booking_id = ?", booking_id)
+        result = cursor.fetchone()
+        count = result[0]
+
+        if count == 0:
             return {"success": True, "message": f"Booking with ID {booking_id} deleted successfully."}
         else:
             return {"success": False, "message": f"Booking with ID {booking_id} not found."}
+
+        # if cursor.rowcount > 0:
+        #     return {"success": True, "message": f"Booking with ID {booking_id} deleted successfully."}
+        # else:
+        #     return {"success": False, "message": f"Booking with ID {booking_id} not found."}
 
     except Exception as e:
         print("Error: %s" % e)
