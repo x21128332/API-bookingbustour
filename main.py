@@ -80,7 +80,7 @@ async def create_booking(booking: Booking):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("EXEC [dbo].[create_booking] @email_address = ?, @tour_id = ?", booking.email_address, booking.tour_id)
+        cursor.execute("EXEC [dbo].[create_booking_procedure] @email_address = ?, @tour_id = ?", booking.email_address, booking.tour_id)
         booking_id = cursor.fetchone()[0]
         cursor.close()
         conn.close()

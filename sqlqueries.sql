@@ -57,3 +57,13 @@ BEGIN
     INSERT INTO [dbo].[bookings] VALUES (@email_address, GETDATE(), @tour_id)
 END;
 GO
+
+CREATE PROCEDURE [dbo].[create_booking]
+    @email_address VARCHAR(100),
+	@tour_id INT,
+	@booking_id INT OUTPUT
+AS
+BEGIN
+    INSERT INTO [dbo].[bookings] VALUES (@email_address, GETDATE(), @tour_id)
+	SET @booking_id = SCOPE_IDENTITY()
+END;
