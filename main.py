@@ -90,6 +90,7 @@ async def create_booking(booking: Booking):
                , booking.email_address, booking.tour_id)
         booking_id = cursor.fetchval() # retrieve the value of the booking_id       
         # booking_id = cursor.fetchone()[0]
+        conn.commit() # commit the changes
         cursor.close()
         conn.close()
 
