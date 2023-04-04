@@ -4,13 +4,17 @@
 CREATE USER [aislingsbustours-bookingapi/slots/staging] FROM EXTERNAL PROVIDER;
 ALTER ROLE db_datareader ADD MEMBER [aaislingsbustours-bookingapi/slots/staging];
 GRANT SELECT TO [aislingsbustours-bookingapi/slots/staging];
+GRANT INSERT TO [aislingsbustours-bookingapi/slots/staging];
+GRANT DELETE TO [aislingsbustours-bookingapi/slots/staging];
 GRANT EXECUTE ON [dbo].[timetable_procedure] TO [aislingsbustours-bookingapi/slots/staging];
 GRANT EXECUTE ON [dbo].[get_booking_procedure] TO [aislingsbustours-bookingapi/slots/staging];
 GRANT EXECUTE ON SCHEMA::dbo TO [aislingsbustours-bookingapi/slots/staging];
 
 CREATE USER [aislingsbustours-bookingapi] FROM EXTERNAL PROVIDER;
 ALTER ROLE db_datareader ADD MEMBER [aislingsbustours-bookingapi];
-GRANT SELECT TO a[aislingsbustours-bookingapi];
+GRANT SELECT TO [aislingsbustours-bookingapi];
+GRANT INSERT TO [aislingsbustours-bookingapi];
+GRANT DELETE TO [aislingsbustours-bookingapi];
 GRANT EXECUTE ON [dbo].[timetable_procedure] TO [aislingsbustours-bookingapi];
 GRANT EXECUTE ON [dbo].[get_booking_procedure] TO [aislingsbustours-bookingapi];
 GRANT EXECUTE ON SCHEMA::dbo TO [aislingsbustours-bookingapi];
@@ -49,21 +53,31 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE create_booking
-    @email_address VARCHAR(100),
-	@tour_id INT
-AS
-BEGIN
-    INSERT INTO [dbo].[bookings] VALUES (@email_address, GETDATE(), @tour_id)
-END;
-GO
-
-CREATE PROCEDURE [dbo].[create_booking]
+CREATE PROCEDURE [dbo].[create_booking_procedure]
     @email_address VARCHAR(100),
 	@tour_id INT,
-	@booking_id INT OUTPUT
+    @booking_id INT OUTPUT
 AS
 BEGIN
-    INSERT INTO [dbo].[bookings] VALUES (@email_address, GETDATE(), @tour_id)
-	SET @booking_id = SCOPE_IDENTITY()
+    INSERT INTO [dbo].[bookings] (email_address, booking_date, tour_id)
+	OUTPUT inserted.booking_id
+    VALUES (@email_address, GETDATE(), @tour_id)
+END;
+
+CREATE PROCEDURE [dbo].[delete_booking_procedure]
+    @booking_id INT
+AS
+BEGIN
+    DELETE FROM [dbo].[bookings] WHERE booking_id = @booking_id
+END;
+
+CREATE PROCEDURE [dbo].[create_passenger_procedure]
+    @first_name VARCHAR(50),
+    @last_name VARCHAR(50),
+    @email_address VARCHAR(100)
+	
+AS
+BEGIN
+    INSERT INTO [dbo].[passengers]
+    VALUES (@first_name, @last_name, @email_address)
 END;

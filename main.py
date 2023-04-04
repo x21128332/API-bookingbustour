@@ -16,6 +16,11 @@ class Booking(BaseModel):
     email_address: str
     tour_id: int
 
+class Passenger(BaseModel):
+    first_name: str
+    last_name: str
+    email_address: str
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
@@ -41,6 +46,26 @@ def view_passengers():
     cursor.close()
     conn.close()
     return {"passengers": passengers}
+
+@app.post('/create-passenger')
+async def create_passenger(passenger: Passenger):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(" EXEC [dbo].[create_passenger_procedure] @first_name = ?, @last_name = ?, @email_address = ?", passenger.first_name, passenger.last_name, passenger.email_address) 
+        conn.commit() # commit the changes
+        passenger = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if passenger:
+            return{"success": True, "passenger": passenger}
+        else:
+            return {'error': 'Passenger not created'}
+       
+    except Exception as e:
+        print("Error: %s" % e)
+        return {'error': str(e)}
 
 @app.get("/bookings")
 def view_bookings():
