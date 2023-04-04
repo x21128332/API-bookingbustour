@@ -128,12 +128,13 @@ async def delete_booking(booking_id: int):
         cursor = conn.cursor()
         cursor.execute("EXEC [dbo].[delete_booking_procedure] @booking_id = ?", booking_id)
         conn.commit()
-        cursor.close()
-        conn.close()
 
         cursor.execute("SELECT COUNT(*) FROM bookings WHERE booking_id = ?", booking_id)
         result = cursor.fetchone()
         count = result[0]
+
+        cursor.close()
+        conn.close()
 
         if count == 0:
             return {"success": True, "message": f"Booking with ID {booking_id} deleted successfully."}
