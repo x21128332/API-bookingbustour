@@ -81,3 +81,4 @@ async def create_booking(booking: Booking):
        
     except Exception as e:
         print("Error: %s" % e)
+        return {'error': str(e)}
