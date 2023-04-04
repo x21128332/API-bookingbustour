@@ -74,10 +74,10 @@ async def create_booking(booking: Booking):
         cursor.close()
         conn.close()
 
-        if not booking_created:
-            return {'error': 'Booking not created'}
+        if booking_created:
+            return("Booking created: ", booking_created)
         else:
-            return("Booking created", booking_created)
+            return {'error': 'Booking not created'}
        
     except Exception as e:
         print("Error: %s" % e)
