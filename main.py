@@ -77,7 +77,7 @@ async def create_booking(booking: Booking):
         if not booking_created:
             return {'error': 'Booking not created'}
         else:
-            return("Booking created")
+            return("Booking created", booking_created)
        
     except Exception as e:
         print("Error: %s" % e)
