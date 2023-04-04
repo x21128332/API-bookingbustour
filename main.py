@@ -75,7 +75,7 @@ def get_booking(booking_id: int):
     except Exception as e:
         print("Error: %s" % e)
 
-@app.post('/create_booking')
+@app.post('/create-booking')
 async def create_booking(booking: Booking):
     try:
         conn = get_db_connection()
