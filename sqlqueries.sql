@@ -24,6 +24,11 @@ from [dbo].[timetables]
 JOIN [dbo].[tours] on [dbo].[timetables].tour_id=[dbo].[tours].tour_id;
 GO;
 
+CREATE PROCEDURE get_passengers_procedure
+AS
+SELECT * FROM [dbo].[passengers]
+GO;
+
 CREATE PROCEDURE get_booking_procedure
 AS
 SELECT [dbo].[bookings].booking_date, [dbo].[passengers].first_name, [dbo].[passengers].last_name, [dbo].[bookings].seat_number, [dbo].[tours].origin, [dbo].[tours].destination

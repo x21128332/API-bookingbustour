@@ -31,6 +31,17 @@ def view_timetables():
     conn.close()
     return {"timetables": timetables}
 
+@app.get("/passengers")
+def view_passengers():
+    conn = get_db_connection()  
+    cursor = conn.cursor()
+    cursor.execute("EXEC dbo.get_passengers_procedure;")    
+    rows = cursor.fetchall()
+    passengers = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
+    cursor.close()
+    conn.close()
+    return {"passengers": passengers}
+
 @app.get("/bookings")
 def view_bookings():
     conn = get_db_connection()  
