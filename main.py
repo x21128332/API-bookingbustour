@@ -70,26 +70,14 @@ async def create_booking(booking: Booking):
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("EXEC [dbo].[create_booking] @email_address = ?, @tour_id = ?", booking.email_address, booking.tour_id)
+        booking_created = cursor.fetchall()
         cursor.close()
         conn.close()
-        
-        return("Booking created")
+
+        if not booking_created:
+            return {'error': 'Booking not created'}
+        else:
+            return("Booking created")
        
     except Exception as e:
         print("Error: %s" % e)
-    
-
-#  # adding the sql stored procedure script and parameter values
-#         stored_proc = "[dbo].[search_booking_procedure] @booking_id = ?"
-#         params = (booking_id)
-#         # Execute stored procedur with the params
-#         cursor.execute(stored_proc, params)
-    
-#         # Iterate the cursor
-#         row = cursor.fetchone()
-#         while row:
-#             print(str(row[0]) + " : " + str(row[1] or 'hi') )
-#             row = cursor.fetchone()
-#         cursor.close()
-#         del cursor
-#         conn.close()
