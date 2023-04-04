@@ -80,16 +80,9 @@ async def create_booking(booking: Booking):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        # cursor.execute("EXEC [dbo].[create_booking_procedure] @email_address = ?, @tour_id = ?", booking.email_address, booking.tour_id)
-        # cursor.execute(
-        #     "INSERT INTO bookings (email_address, booking_date, tour_id) VALUES (?, GETDATE(), ?); SELECT SCOPE_IDENTITY()",
-        #     booking.email_address,
-        #     booking.tour_id
-        # )
         cursor.execute("DECLARE @booking_id INT; EXEC [dbo].[create_booking_procedure] @email_address = ?, @tour_id = ?, @booking_id = @booking_id OUTPUT;"
                , booking.email_address, booking.tour_id)
         booking_id = cursor.fetchval() # retrieve the value of the booking_id       
-        # booking_id = cursor.fetchone()[0]
         conn.commit() # commit the changes
         cursor.close()
         conn.close()
@@ -99,6 +92,25 @@ async def create_booking(booking: Booking):
         else:
             return {'error': 'Booking not created'}
        
+    except Exception as e:
+        print("Error: %s" % e)
+        return {'error': str(e)}
+    
+@app.delete('/delete-bookings/{booking_id}')
+async def delete_booking(booking_id: int):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("EXEC [dbo].[delete_booking_procedure] @booking_id = ?", booking_id)
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        if cursor.rowcount > 0:
+            return {"success": True, "message": f"Booking with ID {booking_id} deleted successfully."}
+        else:
+            return {"success": False, "message": f"Booking with ID {booking_id} not found."}
+
     except Exception as e:
         print("Error: %s" % e)
         return {'error': str(e)}
