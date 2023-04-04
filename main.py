@@ -81,12 +81,16 @@ async def create_booking(booking: Booking):
         conn = get_db_connection()
         cursor = conn.cursor()
         # cursor.execute("EXEC [dbo].[create_booking_procedure] @email_address = ?, @tour_id = ?", booking.email_address, booking.tour_id)
-        cursor.execute(
-            "INSERT INTO bookings (email_address, booking_date, tour_id) VALUES (?, GETDATE(), ?); SELECT SCOPE_IDENTITY()",
-            booking.email_address,
-            booking.tour_id
-        )
-        booking_id = cursor.fetchone()[0]
+        # cursor.execute(
+        #     "INSERT INTO bookings (email_address, booking_date, tour_id) VALUES (?, GETDATE(), ?); SELECT SCOPE_IDENTITY()",
+        #     booking.email_address,
+        #     booking.tour_id
+        # )
+        output_parameter = pyodbc.output("booking_id")
+        cursor.execute("EXEC [dbo].[create_booking_procedure] @email_address=?, @tour_id=?, @booking_id=?", 
+                booking.email_address, booking.tour_id, output_parameter)
+        # booking_id = cursor.fetchone()[0]
+        booking_id = output_parameter.value
         cursor.close()
         conn.close()
 
