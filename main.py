@@ -54,14 +54,9 @@ async def create_passenger(passenger: Passenger):
         cursor = conn.cursor()
         cursor.execute(" EXEC [dbo].[create_passenger_procedure] @first_name = ?, @last_name = ?, @email_address = ?", passenger.first_name, passenger.last_name, passenger.email_address) 
         conn.commit() # commit the changes
-        passenger = cursor.fetchone()
         cursor.close()
         conn.close()
-
-        if passenger:
-            return{"success": True, "passenger": passenger}
-        else:
-            return {'error': 'Passenger not created'}
+        return{"success": True, "message": "Passenger create successfully"}
        
     except Exception as e:
         print("Error: %s" % e)
