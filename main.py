@@ -70,15 +70,16 @@ async def create_booking(booking: Booking):
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("EXEC [dbo].[create_booking] @email_address = ?, @tour_id = ?", booking.email_address, booking.tour_id)
-        booking_created = cursor.fetchall()
+        booking_created = cursor.execute("SELECT SCOPE_IDENTITY()").fetchone()[0]
+        cursor.commit()
         cursor.close()
         conn.close()
 
         if booking_created:
-            return("Booking created: ", booking_created)
+            return("Booking created: Booking ID is ": booking_id)
         else:
             return {'error': 'Booking not created'}
        
-    except Exception as e:
-        print("Error: %s" % e)
-        return {'error': str(e)}
+    except pyodbc.Error as e:
+        error_message = "Error: {}".format(str(e))
+        return {'error': error_message}
