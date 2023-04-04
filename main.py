@@ -86,7 +86,7 @@ async def create_booking(booking: Booking):
         #     booking.email_address,
         #     booking.tour_id
         # )
-        cursor.execute("DECLARE @booking_id INT; EXEC [dbo].[create_booking] @email_address = ?, @tour_id = ?, @booking_id = @booking_id OUTPUT;"
+        cursor.execute("DECLARE @booking_id INT; EXEC [dbo].[create_booking_procedure] @email_address = ?, @tour_id = ?, @booking_id = @booking_id OUTPUT;"
                , booking.email_address, booking.tour_id)
         booking_id = cursor.fetchval() # retrieve the value of the booking_id       
         # booking_id = cursor.fetchone()[0]
