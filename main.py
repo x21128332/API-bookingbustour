@@ -86,11 +86,10 @@ async def create_booking(booking: Booking):
         #     booking.email_address,
         #     booking.tour_id
         # )
-        output_parameter = pyodbc.output("booking_id")
-        cursor.execute("EXEC [dbo].[create_booking_procedure] @email_address=?, @tour_id=?, @booking_id=?", 
-                booking.email_address, booking.tour_id, output_parameter)
+        cursor.execute("DECLARE @booking_id INT; EXEC [dbo].[create_booking] @email_address = ?, @tour_id = ?, @booking_id = @booking_id OUTPUT;"
+               , booking.email_address, booking.tour_id)
+        booking_id = cursor.fetchval() # retrieve the value of the booking_id       
         # booking_id = cursor.fetchone()[0]
-        booking_id = output_parameter.value
         cursor.close()
         conn.close()
 
