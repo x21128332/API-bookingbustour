@@ -14,7 +14,7 @@ function createBooking() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Booking created. Booking ID: ' + data.booking_id);
+            alert('Booking created. Booking ID: ' + data.booking_id[0]);
         } else {
             alert('Error: ' + data.error);
         }
