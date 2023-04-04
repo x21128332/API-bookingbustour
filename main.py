@@ -96,7 +96,7 @@ async def create_booking(booking: Booking):
         print("Error: %s" % e)
         return {'error': str(e)}
     
-@app.delete('/delete-bookings/{booking_id}')
+@app.delete('/delete-booking/{booking_id}')
 async def delete_booking(booking_id: int):
     try:
         conn = get_db_connection()
