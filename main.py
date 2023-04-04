@@ -82,7 +82,7 @@ async def create_booking(booking: Booking):
         cursor = conn.cursor()
         # cursor.execute("EXEC [dbo].[create_booking_procedure] @email_address = ?, @tour_id = ?", booking.email_address, booking.tour_id)
         cursor.execute(
-            "INSERT INTO bookings (email_address, tour_id) VALUES (?, ?); SELECT SCOPE_IDENTITY()",
+            "INSERT INTO bookings (email_address, booking_date, tour_id) VALUES (?, GETDATE(), ?); SELECT SCOPE_IDENTITY()",
             booking.email_address,
             booking.tour_id
         )
