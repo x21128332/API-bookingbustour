@@ -107,7 +107,7 @@ def get_booking(email_address: str):
         cursor = conn.cursor()
         cursor.execute("EXEC [dbo].[get_passenger_booking_procedure] @email_address = ?", email_address)
         columns = [column[0] for column in cursor.description]
-        booking = cursor.fetchone()
+        booking = cursor.fetchall()
         cursor.close()
         conn.close()
 
