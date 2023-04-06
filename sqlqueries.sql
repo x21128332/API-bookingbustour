@@ -45,11 +45,10 @@ CREATE PROCEDURE search_booking_procedure
     @booking_id INT
 AS
 BEGIN
-    SELECT [dbo].[bookings].booking_id, [dbo].[bookings].booking_date, [dbo].[passengers].first_name, [dbo].[passengers].last_name, [dbo].[tours].origin, [dbo].[tours].destination
-		FROM [dbo].[bookings]
-		JOIN [dbo].[passengers] ON [dbo].[bookings].email_address=[dbo].[passengers].email_address
-		JOIN [dbo].[tours] ON [dbo].[bookings].tour_id=[dbo].[tours].tour_id
-  	WHERE [dbo].[bookings].booking_id = @booking_id
+SELECT [dbo].[bookings].booking_id, [dbo].[bookings].booking_date, [dbo].[passengers].first_name, [dbo].[passengers].last_name, [dbo].[tours].tour_id, [dbo].[tours].origin, [dbo].[tours].destination
+FROM [dbo].[bookings]
+JOIN [dbo].[passengers] ON [dbo].[bookings].email_address=[dbo].[passengers].email_address
+JOIN [dbo].[tours] ON [dbo].[bookings].tour_id=[dbo].[tours].tour_id;
 END;
 GO
 
@@ -81,3 +80,10 @@ BEGIN
     INSERT INTO [dbo].[passengers]
     VALUES (@first_name, @last_name, @email_address)
 END;
+
+CREATE PROCEDURE [dbo].[get_passenger_booking_procedure]    
+AS
+SELECT [dbo].[bookings].booking_id, [dbo].[bookings].booking_date, [dbo].[passengers].first_name, [dbo].[passengers].last_name, [dbo].[tours].tour_id, [dbo].[tours].origin, [dbo].[tours].destination
+FROM [dbo].[bookings]
+JOIN [dbo].[passengers] ON [dbo].[bookings].email_address=[dbo].[passengers].email_address
+JOIN [dbo].[tours] ON [dbo].[bookings].tour_id=[dbo].[tours].tour_id;
