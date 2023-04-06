@@ -107,15 +107,15 @@ def get_booking(email_address: str):
         cursor = conn.cursor()
         cursor.execute("EXEC [dbo].[get_passenger_booking_procedure] @email_address = ?", email_address)
         columns = [column[0] for column in cursor.description]
-        booking = cursor.fetchall()
+        rows = cursor.fetchall()
+        passengerBookings = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
         cursor.close()
         conn.close()
 
-        if not booking:
+        if not passengerBookings:
             return {'error': 'passenger has no bookings'}
         
-        booking_dict = dict(zip(columns, booking))
-        return booking_dict
+        return {"passengers": passengerBookings}
 
     except Exception as e:
         print("Error: %s" % e)
