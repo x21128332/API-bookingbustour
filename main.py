@@ -179,7 +179,7 @@ async def update_booking(booking_id: int, booking: Booking):
         cursor.close()
         conn.close()
 
-        if cursor.rowcount > 0:
+        if cursor.rowcount < 0:
             return {"success": True, "message": f"Booking with ID {booking_id} updated successfully."}
         else:
             return {"success": False, "message": f"Booking with ID {booking_id} not found."}
