@@ -25,6 +25,7 @@ class Passenger(BaseModel):
 def read_root():
     return {"Hello": "World"}
 
+# view all timetables
 @app.get("/timetables")
 def view_timetables():
     conn = get_db_connection()  
@@ -36,6 +37,7 @@ def view_timetables():
     conn.close()
     return {"timetables": timetables}
 
+# view all passengers
 @app.get("/passengers")
 def view_passengers():
     conn = get_db_connection()  
@@ -47,6 +49,7 @@ def view_passengers():
     conn.close()
     return {"passengers": passengers}
 
+# create a passenger
 @app.post('/create-passenger')
 async def create_passenger(passenger: Passenger):
     try:
@@ -62,6 +65,7 @@ async def create_passenger(passenger: Passenger):
         print("Error: %s" % e)
         return {'error': str(e)}
 
+#view all bookings
 @app.get("/bookings")
 def view_bookings():
     conn = get_db_connection()  
@@ -73,28 +77,50 @@ def view_bookings():
     conn.close() 
     return {"bookings": bookings}
 
-@app.get('/bookings/{booking_id}')
-def get_booking(booking_id: int):
+# view a specific booking
+# @app.get('/bookings/{booking_id}')
+# def get_booking(booking_id: int):
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+#         #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
+#         cursor.execute("EXEC [dbo].[search_booking_procedure] @booking_id = ?", booking_id)
+#         columns = [column[0] for column in cursor.description]
+#         booking = cursor.fetchone()
+#         cursor.close()
+#         conn.close()
+
+#         if not booking:
+#             return {'error': 'Booking not found'}
+        
+#         booking_dict = dict(zip(columns, booking))
+#         return booking_dict
+
+#     except Exception as e:
+#         print("Error: %s" % e)
+
+# view all passengers bookings
+@app.get('/bookings/{email_address}')
+def get_booking(email_address: str):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
-        cursor.execute("EXEC [dbo].[search_booking_procedure] @booking_id = ?", booking_id)
+        cursor.execute("EXEC [dbo].[get_passenger_booking_procedure] @email_address = ?", email_address)
         columns = [column[0] for column in cursor.description]
         booking = cursor.fetchone()
         cursor.close()
         conn.close()
 
         if not booking:
-            return {'error': 'Booking not found'}
+            return {'error': 'passenger has no bookings'}
         
         booking_dict = dict(zip(columns, booking))
         return booking_dict
-        #    return {'booking_id': booking.booking_id, 'booking_date': booking.booking_date, 'first_name': booking.first_name}
 
     except Exception as e:
         print("Error: %s" % e)
 
+# create a new booking
 @app.post('/create-booking')
 async def create_booking(booking: Booking):
     try:
@@ -115,7 +141,8 @@ async def create_booking(booking: Booking):
     except Exception as e:
         print("Error: %s" % e)
         return {'error': str(e)}
-    
+
+# delete a specific booking 
 @app.delete('/delete-booking/{booking_id}')
 async def delete_booking(booking_id: int):
     try:
@@ -136,10 +163,26 @@ async def delete_booking(booking_id: int):
         else:
             return {"success": False, "message": f"Booking with ID {booking_id} not found."}
 
-        # if cursor.rowcount > 0:
-        #     return {"success": True, "message": f"Booking with ID {booking_id} deleted successfully."}
-        # else:
-        #     return {"success": False, "message": f"Booking with ID {booking_id} not found."}
+    except Exception as e:
+        print("Error: %s" % e)
+        return {'error': str(e)}
+
+# update a specific booking   
+@app.put('/update-booking/{booking_id}')
+async def update_booking(booking_id: int, booking: Booking):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("EXEC [dbo].[update_booking_procedure] @booking_id = ?, @email_address = ?, @tour_id = ?"
+               , booking_id, booking.email_address, booking.tour_id)
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        if cursor.rowcount > 0:
+            return {"success": True, "message": f"Booking with ID {booking_id} updated successfully."}
+        else:
+            return {"success": False, "message": f"Booking with ID {booking_id} not found."}
 
     except Exception as e:
         print("Error: %s" % e)
