@@ -13,13 +13,19 @@ def get_db_connection():
     return pyodbc.connect(connection_string)
 
 class Booking(BaseModel):
-    passenger_id: int
+    email_address: str
     tour_id: int
+
+class Passenger(BaseModel):
+    first_name: str
+    last_name: str
+    email_address: str
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
+# view all timetables
 @app.get("/timetables")
 def view_timetables():
     conn = get_db_connection()  
@@ -31,6 +37,35 @@ def view_timetables():
     conn.close()
     return {"timetables": timetables}
 
+# view all passengers
+@app.get("/passengers")
+def view_passengers():
+    conn = get_db_connection()  
+    cursor = conn.cursor()
+    cursor.execute("EXEC dbo.get_passengers_procedure;")    
+    rows = cursor.fetchall()
+    passengers = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
+    cursor.close()
+    conn.close()
+    return {"passengers": passengers}
+
+# create a passenger
+@app.post('/create-passenger')
+async def create_passenger(passenger: Passenger):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(" EXEC [dbo].[create_passenger_procedure] @first_name = ?, @last_name = ?, @email_address = ?", passenger.first_name, passenger.last_name, passenger.email_address) 
+        conn.commit() # commit the changes
+        cursor.close()
+        conn.close()
+        return{"success": True, "message": "Passenger create successfully"}
+       
+    except Exception as e:
+        print("Error: %s" % e)
+        return {'error': str(e)}
+
+#view all bookings
 @app.get("/bookings")
 def view_bookings():
     conn = get_db_connection()  
@@ -42,55 +77,113 @@ def view_bookings():
     conn.close() 
     return {"bookings": bookings}
 
-@app.get('/bookings/{booking_id}')
-def get_booking(booking_id: int):
+# view a specific booking
+# @app.get('/bookings/{booking_id}')
+# def get_booking(booking_id: int):
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+#         #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
+#         cursor.execute("EXEC [dbo].[search_booking_procedure] @booking_id = ?", booking_id)
+#         columns = [column[0] for column in cursor.description]
+#         booking = cursor.fetchone()
+#         cursor.close()
+#         conn.close()
+
+#         if not booking:
+#             return {'error': 'Booking not found'}
+        
+#         booking_dict = dict(zip(columns, booking))
+#         return booking_dict
+
+#     except Exception as e:
+#         print("Error: %s" % e)
+
+# view all passengers bookings
+@app.get('/bookings/{email_address}')
+def get_booking(email_address: str):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
-        cursor.execute("EXEC [dbo].[search_booking_procedure] @booking_id = ?", booking_id)
+        cursor.execute("EXEC [dbo].[get_passenger_booking_procedure] @email_address = ?", email_address)
         columns = [column[0] for column in cursor.description]
-        booking = cursor.fetchone()
+        rows = cursor.fetchall()
+        passengerBookings = [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
         cursor.close()
         conn.close()
 
-        if not booking:
-            return {'error': 'Booking not found'}
+        if not passengerBookings:
+            return {'error': 'passenger has no bookings'}
         
-        booking_dict = dict(zip(columns, booking))
-        return booking_dict
-        #    return {'booking_id': booking.booking_id, 'booking_date': booking.booking_date, 'first_name': booking.first_name}
+        return {"passengers": passengerBookings}
 
     except Exception as e:
         print("Error: %s" % e)
 
-@app.post('/create_booking}')
+# create a new booking
+@app.post('/create-booking')
 async def create_booking(booking: Booking):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
-        cursor.execute("EXEC [dbo].[create_booking] @passenger_id = ? ",booking.passenger_id,", @tour_id = ?", booking.tour_id)
+        cursor.execute("DECLARE @booking_id INT; EXEC [dbo].[create_booking_procedure] @email_address = ?, @tour_id = ?, @booking_id = @booking_id OUTPUT;"
+               , booking.email_address, booking.tour_id)
+        booking_id = cursor.fetchval() # retrieve the value of the booking_id       
+        conn.commit() # commit the changes
         cursor.close()
         conn.close()
-        
-        return("Booking created")
+
+        if booking_id:
+            return{"success": True, "booking_id": booking_id}
+        else:
+            return {'error': 'Booking not created'}
        
     except Exception as e:
         print("Error: %s" % e)
-    
+        return {'error': str(e)}
 
-#  # adding the sql stored procedure script and parameter values
-#         stored_proc = "[dbo].[search_booking_procedure] @booking_id = ?"
-#         params = (booking_id)
-#         # Execute stored procedur with the params
-#         cursor.execute(stored_proc, params)
-    
-#         # Iterate the cursor
-#         row = cursor.fetchone()
-#         while row:
-#             print(str(row[0]) + " : " + str(row[1] or 'hi') )
-#             row = cursor.fetchone()
-#         cursor.close()
-#         del cursor
-#         conn.close()
+# delete a specific booking 
+@app.delete('/delete-booking/{booking_id}')
+async def delete_booking(booking_id: int):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("EXEC [dbo].[delete_booking_procedure] @booking_id = ?", booking_id)
+        conn.commit()
+
+        cursor.execute("SELECT COUNT(*) FROM bookings WHERE booking_id = ?", booking_id)
+        result = cursor.fetchone()
+        count = result[0]
+
+        cursor.close()
+        conn.close()
+
+        if count == 0:
+            return {"success": True, "message": f"Booking with ID {booking_id} deleted successfully."}
+        else:
+            return {"success": False, "message": f"Booking with ID {booking_id} not found."}
+
+    except Exception as e:
+        print("Error: %s" % e)
+        return {'error': str(e)}
+
+# update a specific booking   
+@app.put('/update-booking/{booking_id}')
+async def update_booking(booking_id: int, booking: Booking):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("EXEC [dbo].[update_booking_procedure] @booking_id = ?, @email_address = ?, @tour_id = ?"
+               , booking_id, booking.email_address, booking.tour_id)
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        if cursor.rowcount < 0:
+            return {"success": True, "message": f"Booking with ID {booking_id} updated successfully."}
+        else:
+            return {"success": False, "message": f"Booking with ID {booking_id} not found."}
+
+    except Exception as e:
+        print("Error: %s" % e)
+        return {'error': str(e)}
