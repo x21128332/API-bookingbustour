@@ -59,7 +59,7 @@ async def create_passenger(passenger: Passenger):
         conn.commit() # commit the changes
         cursor.close()
         conn.close()
-        return{"success": True, "message": "Passenger create successfully"}
+        return{"success": True, "message": "Passenger created successfully"}
        
     except Exception as e:
         print("Error: %s" % e)
