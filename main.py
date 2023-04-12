@@ -78,7 +78,7 @@ def view_bookings():
     return {"bookings": bookings}
 
 # view a specific booking
-@app.get('/bookings/{booking_id}')
+@app.get('/getbookings/{booking_id}')
 def get_booking(booking_id: int):
     try:
         conn = get_db_connection()
