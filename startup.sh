@@ -1,10 +1,3 @@
 #!/bin/bash
 
-# Get the number of CPU cores available on the server
-num_cpus=$(nproc)
-
-# Calculate the number of workers to use (2 per CPU core)
-num_workers=$((2 * $num_cpus))
-
-# Start the FastAPI app with the specified number of workers
-gunicorn main:app --workers $num_workers
+gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
