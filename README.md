@@ -1,4 +1,4 @@
-## API Aisling's Bus tours, using FASTAPI and Azure App Service
+# API - Aisling's Bus tours, using FASTAPI and Azure App Service
 
 This follows on from the README at [Scalable Cloud Programming](https://github.com/x21128332/ScalableCloudProgramming).
 
@@ -17,4 +17,4 @@ This follows on from the README at [Scalable Cloud Programming](https://github.c
 
 ## Service bus
 
-## Aunctions
+## Functions
