@@ -78,26 +78,26 @@ def view_bookings():
     return {"bookings": bookings}
 
 # view a specific booking
-# @app.get('/bookings/{booking_id}')
-# def get_booking(booking_id: int):
-#     try:
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
-#         #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
-#         cursor.execute("EXEC [dbo].[search_booking_procedure] @booking_id = ?", booking_id)
-#         columns = [column[0] for column in cursor.description]
-#         booking = cursor.fetchone()
-#         cursor.close()
-#         conn.close()
+@app.get('/bookings/{booking_id}')
+def get_booking(booking_id: int):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        #cursor.execute("SELECT * FROM Bookings WHERE BookingId=?", booking_id)
+        cursor.execute("EXEC [dbo].[search_booking_procedure] @booking_id = ?", booking_id)
+        columns = [column[0] for column in cursor.description]
+        booking = cursor.fetchone()
+        cursor.close()
+        conn.close()
 
-#         if not booking:
-#             return {'error': 'Booking not found'}
+        if not booking:
+            return {'error': 'Booking not found'}
         
-#         booking_dict = dict(zip(columns, booking))
-#         return booking_dict
+        booking_dict = dict(zip(columns, booking))
+        return booking_dict
 
-#     except Exception as e:
-#         print("Error: %s" % e)
+    except Exception as e:
+        print("Error: %s" % e)
 
 # view all passengers bookings
 @app.get('/bookings/{email_address}')
