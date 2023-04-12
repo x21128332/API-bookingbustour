@@ -5,7 +5,7 @@ This follows on from the README at [Scalable Cloud Programming](https://github.c
 ## App Service
 * Create a new App Service using the App Service plan that you created previously.
 * Follow the same steps to create a staging slot.
-* In General settings step there is an additional requirement. You need to add a startup command `gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000`
+* In General settings step there is an additional requirement. You need to add a startup command, add `startup.sh` to that box
 
 ## Managed Identity
 1. In the Azure App Service, go to the Identity and turn on System Assigned Managed Identity
