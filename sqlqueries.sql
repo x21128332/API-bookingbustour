@@ -2,7 +2,7 @@
   Add both api app service slots as a managed identity*/
 
 CREATE USER [aislingsbustours-bookingapi/slots/staging] FROM EXTERNAL PROVIDER;
-ALTER ROLE db_datareader ADD MEMBER [aaislingsbustours-bookingapi/slots/staging];
+ALTER ROLE db_datareader ADD MEMBER [aislingsbustours-bookingapi/slots/staging];
 GRANT SELECT TO [aislingsbustours-bookingapi/slots/staging];
 GRANT INSERT TO [aislingsbustours-bookingapi/slots/staging];
 GRANT DELETE TO [aislingsbustours-bookingapi/slots/staging];
