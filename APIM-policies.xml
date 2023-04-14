@@ -1,0 +1,74 @@
+
+<!-- All Operations -->
+
+<policies>
+    <inbound>
+        <base />
+        <set-header name="Content-Type" exists-action="override">
+            <value>application/json</value>
+        </set-header>
+        <cors allow-credentials="false">
+            <allowed-origins>
+                <origin>https://aislingsbustours-bookingapi.azurewebsites.net/</origin>
+            </allowed-origins>
+            <allowed-methods>
+                <method>*</method>
+            </allowed-methods>
+        </cors>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
+
+<!-- PUT -->
+
+<policies>
+    <inbound>
+        <base />
+        <set-method>POST</set-method>
+        <set-variable name="resourceUri" value="{{servicebusURL}}/bookings" />
+        <set-variable name="sasKeyName" value="bookings" />
+        <set-variable name="sasKey" value="{{servicebusSASkey}}" />
+        <set-header name="action" exists-action="override">
+            <value>"edit"</value>
+        </set-header>
+        <set-header name="Authorization" exists-action="override">
+            <value>@{
+                // Load variables
+                string resourceUri = (string) context.Variables.GetValueOrDefault("resourceUri");
+                string sasKeyName = (string) context.Variables.GetValueOrDefault("sasKeyName");
+                string sasKey = (string) context.Variables.GetValueOrDefault("sasKey");
+                
+                // Set the token lifespan
+                System.TimeSpan sinceEpoch = System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1));
+                var expiry = System.Convert.ToString((int)sinceEpoch.TotalSeconds + 60); //1 minute
+                string stringToSign = System.Uri.EscapeDataString(resourceUri) + "\n" + expiry;
+                System.Security.Cryptography.HMACSHA256 hmac = new System.Security.Cryptography.HMACSHA256(System.Text.Encoding.UTF8.GetBytes(sasKey));
+                var signature = System.Convert.ToBase64String(hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(stringToSign)));
+                
+                // Format the sas token
+                var sasToken = String.Format("SharedAccessSignature sr={0}&sig={1}&se={2}&skn={3}",
+                    System.Uri.EscapeDataString(resourceUri), System.Uri.EscapeDataString(signature), expiry, sasKeyName);
+                return sasToken;
+            }</value>
+        </set-header>
+        <rewrite-uri template="/messages" copy-unmatched-params="true" />
+        <set-backend-service base-url="{{servicebusURL}}/bookings" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
