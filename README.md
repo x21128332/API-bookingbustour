@@ -33,13 +33,9 @@ Create APIM in Azure, map your API there and add all the endpoints.
 Apply the policies listed in APIM-policies file. The 1st policy goes on the root of the API, the 2nd policy goes on the PUT endpoint only. These both go into inboud processing policies.
 Edit the 2nd policy to include your service bus connection string details and key names from your vault.
 
-## Functions
-In VSCode, using Azure Tools extension, create a new function app. Pass it the service bus details it asks for.
-Move to configuration settings and add an application setting called "aislingsbustoursqueue_SERVICEBUS" with the vaule
-being pulled from key vault:
-@Microsoft.KeyVault(SecretUri=https://keyvaultabt.vault
-.azure.net/secrets/servicebusconnectionstring/) 
-Update the keyvault name and secret key name to match your key vault and secret key name.
-
 ## Key vault - add identity
-In the Azure Key Vault, go to the Access policies and add 2 new policies one for APIM and one for your funciton. Give both "GET" and "LIST" permissions.
+In the Azure Key Vault, go to the Access policies and a new policy for APIM. Give it both "GET" and "LIST" permissions.
+
+
+
+This continues with the README at [Azure-Function](https://github.com/x21128332/Azure-Function/tree/master/ServiceBusTopicTrigger1).
